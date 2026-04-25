@@ -1,0 +1,48 @@
+# Dépendances
+node_modules/
+
+# Build
+dist/
+dist-ssr/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+logs/
+
+# Environnement
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite
+.vite/
+
+# Éditeurs / IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Configuration locale Claude (preview server, sessions, etc.)
+.claude/
+
+# Sauvegardes accidentelles
+*.bak
+*.tmp
+*~
