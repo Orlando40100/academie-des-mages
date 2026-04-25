@@ -12,7 +12,7 @@ export default function MiniJeuxScreen({ navigate, onPause }) {
   return (
     <Background variant="magic">
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col items-center">
+      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col items-center overflow-y-auto">
         <div className="flex items-center gap-2 w-full max-w-3xl mb-3">
           <h2 className="pixel-title text-xl flex-1">🎮 Mini-jeux</h2>
           <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>

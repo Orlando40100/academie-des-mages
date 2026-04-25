@@ -63,7 +63,7 @@ export default function TourDeMageScreen({ navigate, onPause }) {
   return (
     <Background variant="magic">
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col">
+      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col overflow-y-auto">
         <div className="flex items-center gap-2 mb-3">
           <h2 className="pixel-title text-xl flex-1">🏠 Ma Tour</h2>
           <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>

@@ -50,7 +50,7 @@ export default function HomeScreen({ navigate }) {
 
   return (
     <Background variant="magic">
-      <div className="absolute inset-0 flex flex-col items-center justify-between p-6">
+      <div className="absolute inset-0 flex flex-col items-center justify-between p-3 sm:p-6 overflow-y-auto">
         {/* Silhouettes compagnons en fond */}
         <div className="absolute inset-0 flex items-end justify-around opacity-20 pointer-events-none">
           <SmartSprite assetKey="hulotte" fallback={hulotteSprite} scale={2} />
@@ -85,18 +85,22 @@ export default function HomeScreen({ navigate }) {
         <div className="magic-spark" style={{ left: '6%', top: '70%', animationDelay: '1.4s' }} />
         <div className="magic-spark" style={{ left: '92%', top: '78%', animationDelay: '2.1s' }} />
 
-        {/* Double cercle runique tournant + sprites centraux (Direction A) */}
-        <div className="relative flex items-center justify-center" style={{ width: 360, height: 360 }}>
+        {/* Double cercle runique tournant + sprites centraux (Direction A)
+            → la taille s'adapte à l'écran via clamp() pour ne jamais déborder en mobile. */}
+        <div
+          className="relative flex items-center justify-center home-rune-wrap"
+          style={{ width: 'clamp(220px, 78vw, 360px)', height: 'clamp(220px, 78vw, 360px)' }}
+        >
           {/* Cercle externe : grand, rotation lente */}
           <div
             className="magic-rune absolute"
-            style={{ width: 360, height: 360, left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}
+            style={{ width: '100%', height: '100%', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}
           />
           {/* Cercle interne : plus petit, contre-rotation pour effet */}
           <div
             className="magic-rune absolute"
             style={{
-              width: 240, height: 240,
+              width: '66%', height: '66%',
               left: '50%', top: '50%',
               transform: 'translate(-50%,-50%)',
               animationDirection: 'reverse',
@@ -105,10 +109,10 @@ export default function HomeScreen({ navigate }) {
               opacity: 0.7,
             }}
           />
-          <div className="flex items-end gap-6 relative z-10">
-            <SmartSprite assetKey="aldricIdle" fallback={maitreAldric} scale={4} direction="front" />
-            <SmartSprite assetKey="mageIdle" fallback={mage} scale={4} direction="front" />
-            <SmartSprite assetKey="miaou" fallback={miaou} scale={3} />
+          <div className="flex items-end gap-3 sm:gap-6 relative z-10 home-trio">
+            <SmartSprite assetKey="aldricIdle" fallback={maitreAldric} scale={3} direction="front" />
+            <SmartSprite assetKey="mageIdle"   fallback={mage}         scale={3} direction="front" />
+            <SmartSprite assetKey="miaou"      fallback={miaou}        scale={2} />
           </div>
         </div>
 

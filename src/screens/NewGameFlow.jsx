@@ -53,7 +53,7 @@ export default function NewGameFlow({ onDone }) {
 
   return (
     <Background variant="magic">
-      <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
         <AnimatePresence mode="wait">
           {step === 'cinema' && (
             <motion.div

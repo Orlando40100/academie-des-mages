@@ -13,25 +13,23 @@ import ShopScreen from './screens/ShopScreen.jsx';
 import MenagerieScreen from './screens/MenagerieScreen.jsx';
 import PauseMenu from './screens/PauseMenu.jsx';
 import SaveIndicator from './components/SaveIndicator.jsx';
-import VirtualGamepad from './components/VirtualGamepad.jsx';
 import { GrimoireScreen, BestiaireScreen, BadgesScreen, ModeParentScreen } from './screens/Stubs.jsx';
 import AreneScreen from './screens/AreneScreen.jsx';
 import TourDeMageScreen from './screens/TourDeMageScreen.jsx';
 import DefiScreen from './screens/DefiScreen.jsx';
 import MiniJeuxScreen from './screens/MiniJeuxScreen.jsx';
-import { startInputSystem, getInputMode, onInputModeChange, onAction } from './input/inputManager.js';
+import { startInputSystem, onAction } from './input/inputManager.js';
 import { syncMusic, stopMusic } from './audio/musicController.js';
 
 function Router() {
   const { state, dispatch } = useGame();
   const [payload, setPayload] = useState(null);
   const [pauseOpen, setPauseOpen] = useState(false);
-  const [mode, setMode] = useState(getInputMode());
 
   useEffect(() => {
+    // Système d'input clavier/manette pour desktop. Sur mobile, chaque écran
+    // gère ses propres boutons natifs (pas de gamepad virtuel à l'écran).
     startInputSystem();
-    const off = onInputModeChange(setMode);
-    return off;
   }, []);
 
   // Raccourci pause via action START
@@ -82,9 +80,8 @@ function Router() {
   const screen = state.progression.currentScreen || 'home';
   const onPause = () => setPauseOpen(true);
 
-  // Affiche les boutons tactiles en mode touch OU quand pas de manette ET écran tactile
-  const isTouchDevice = typeof window !== 'undefined' && 'ontouchstart' in window;
-  const showVirtualGamepad = mode === 'touch' && isTouchDevice && screen !== 'home' && screen !== 'modeParent';
+  // Pas de gamepad virtuel : sur mobile, on utilise les boutons natifs de chaque écran
+  // (la duplication créait des conflits, et la worldmap a déjà sa propre nav).
 
   let content;
   switch (screen) {
@@ -129,7 +126,6 @@ function Router() {
       </AnimatePresence>
       <SaveIndicator />
       <PauseMenu open={pauseOpen} onClose={() => setPauseOpen(false)} navigate={(s) => { setPauseOpen(false); navigate(s); }} />
-      {showVirtualGamepad && <VirtualGamepad />}
     </div>
   );
 }

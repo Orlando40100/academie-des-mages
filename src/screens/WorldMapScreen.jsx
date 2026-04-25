@@ -167,23 +167,25 @@ export default function WorldMapScreen({ navigate, onPause }) {
 
       {!selected && (
         <div
-          className="absolute bottom-0 inset-x-0 safe-bottom z-30 px-3 py-2"
+          className="absolute bottom-0 inset-x-0 safe-bottom z-30 px-2 py-1.5"
           style={{
             background: 'linear-gradient(0deg, rgba(15,4,32,0.98), rgba(26,11,46,0.92))',
             borderTop: '3px double #fbbf24',
             boxShadow: '0 -4px 12px rgba(0,0,0,0.5)',
           }}
         >
-          <div className="grid grid-cols-3 gap-1.5 mb-1.5">
-            <button className="pixel-btn pixel-btn-gold" onClick={() => { sounds.select(); navigate('shop'); }}>🏪 Boutique</button>
-            <button className="pixel-btn pixel-btn-pink" onClick={() => { sounds.select(); navigate('menagerie'); }}>🐾 Ménagerie</button>
-            <button className="pixel-btn pixel-btn-ghost" onClick={() => { sounds.select(); navigate('grimoire'); }}>📖 Grimoire</button>
-          </div>
-          <div className="grid grid-cols-4 gap-1.5">
-            <button className="pixel-btn pixel-btn-blue text-[10px]" onClick={() => { sounds.select(); navigate('defi'); }}>📅 Défi</button>
-            <button className="pixel-btn pixel-btn-blue text-[10px]" onClick={() => { sounds.select(); navigate('minijeux'); }}>🎮 Jeux</button>
-            <button className="pixel-btn pixel-btn-ghost text-[10px]" onClick={() => { sounds.select(); navigate('arene'); }}>🏛️ Arène</button>
-            <button className="pixel-btn pixel-btn-ghost text-[10px]" onClick={() => { sounds.select(); navigate('tour'); }}>🏠 Tour</button>
+          {/* Une seule rangée scrollable horizontalement → tient sur mobile sans déborder */}
+          <div
+            className="flex gap-1.5 overflow-x-auto pb-0.5"
+            style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+          >
+            <NavBtn color="gold"  emoji="🏪" label="Boutique"  onClick={() => { sounds.select(); navigate('shop'); }} />
+            <NavBtn color="pink"  emoji="🐾" label="Ménagerie" onClick={() => { sounds.select(); navigate('menagerie'); }} />
+            <NavBtn color="ghost" emoji="📖" label="Grimoire"  onClick={() => { sounds.select(); navigate('grimoire'); }} />
+            <NavBtn color="blue"  emoji="📅" label="Défi"      onClick={() => { sounds.select(); navigate('defi'); }} />
+            <NavBtn color="blue"  emoji="🎮" label="Jeux"      onClick={() => { sounds.select(); navigate('minijeux'); }} />
+            <NavBtn color="ghost" emoji="🏛️" label="Arène"     onClick={() => { sounds.select(); navigate('arene'); }} />
+            <NavBtn color="ghost" emoji="🏠" label="Tour"      onClick={() => { sounds.select(); navigate('tour'); }} />
           </div>
         </div>
       )}
@@ -207,7 +209,7 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
   }, []);
 
   return (
-    <div className="absolute inset-0 pt-14 pb-24">
+    <div className="absolute inset-0 pt-14 pb-20">
       {/* ═══════════ Chemin doré pointillé entre POI (Direction A) ═══════════ */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
@@ -281,24 +283,22 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
         );
       })}
 
-      {/* ═══════════ Mage animé — collé au POI courant (au-dessus à gauche) ═══════════ */}
+      {/* ═══════════ Mage animé — collé au POI courant (au-dessus à gauche) ═══════════
+           On utilise une variable CSS pour adapter la taille au mobile (scale 3) vs desktop (scale 4). */}
       <motion.div
-        className="absolute pointer-events-none"
+        className="absolute pointer-events-none worldmap-mage"
         initial={false}
         animate={{ left: `${magePos.x}%`, top: `${magePos.y}%` }}
         transition={{ duration: 1.1, ease: 'easeInOut' }}
-        // Mage agrandi (scale 4 = 64×64) pour qu'on distingue clairement le visage,
-        // ancré en oblique haut-gauche du disque POI courant.
-        style={{ transform: 'translate(calc(-50% - 48px), calc(-50% - 48px))', zIndex: 25 }}
       >
         <div className={walking ? '' : 'animate-breathe'}>
           {walking ? (
-            <SmartSprite assetKey="mageWalk" variant="walk" direction={walkDir} fallback={mage} scale={4} frameRate={160} />
+            <SmartSprite assetKey="mageWalk" variant="walk" direction={walkDir} fallback={mage} scale={3} frameRate={160} />
           ) : (
-            <SmartSprite assetKey="mageIdle" variant="idle" direction="front" fallback={mage} scale={4} />
+            <SmartSprite assetKey="mageIdle" variant="idle" direction="front" fallback={mage} scale={3} />
           )}
         </div>
-        <div className="w-12 h-2 bg-black/45 rounded-full blur-[2px] mx-auto -mt-[2px]" />
+        <div className="w-10 h-2 bg-black/45 rounded-full blur-[2px] mx-auto -mt-[2px]" />
       </motion.div>
 
       {/* ═══════════ Titre en parchemin (ribbon doré Direction A) ═══════════ */}
@@ -317,3 +317,24 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
 
 // (Les anciens systèmes biomes / rivière / décor / particules / rose-des-vents
 //  ont été supprimés pour matcher le design Direction A — fond sombre épuré.)
+
+// Bouton de navigation compact, optimisé mobile (icône + label sur 2 lignes,
+// tient sur 7 boutons en une seule rangée scrollable horizontalement).
+function NavBtn({ emoji, label, color = 'ghost', onClick }) {
+  const colorCls = {
+    gold:  'pixel-btn-gold',
+    pink:  'pixel-btn-pink',
+    blue:  'pixel-btn-blue',
+    ghost: 'pixel-btn-ghost',
+  }[color] || 'pixel-btn-ghost';
+  return (
+    <button
+      onClick={onClick}
+      className={`pixel-btn ${colorCls} flex flex-col items-center justify-center gap-0.5 shrink-0`}
+      style={{ minWidth: 60, padding: '4px 6px', lineHeight: 1.1 }}
+    >
+      <span style={{ fontSize: 18, lineHeight: 1 }}>{emoji}</span>
+      <span className="font-pixel" style={{ fontSize: 8 }}>{label}</span>
+    </button>
+  );
+}

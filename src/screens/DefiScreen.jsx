@@ -37,7 +37,7 @@ export default function DefiScreen({ navigate, onPause }) {
     return (
       <Background variant="magic">
         <HUD onPause={onPause} />
-        <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col items-center">
+        <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col items-center overflow-y-auto">
           <h2 className="pixel-title text-xl mb-3">📅 Défi du jour</h2>
           <div className="font-retro">Chargement...</div>
         </div>
@@ -50,7 +50,7 @@ export default function DefiScreen({ navigate, onPause }) {
   return (
     <Background variant="magic">
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col items-center">
+      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col items-center overflow-y-auto">
         <div className="flex items-center gap-2 w-full max-w-2xl mb-3">
           <h2 className="pixel-title text-xl flex-1">📅 Défi du jour</h2>
           <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
