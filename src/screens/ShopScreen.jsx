@@ -81,11 +81,23 @@ export default function ShopScreen({ navigate, onPause }) {
       />
 
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 px-3 flex flex-col safe-bottom">
+      {/* CSS Grid au lieu de flex-col : la 3e ligne (1fr) a une hauteur intrinsèquement
+          contrainte → overflow-y scroll fiable sur tous les WebKit mobile.
+          Le wrapper a overflow:hidden pour empêcher la page entière de scroller. */}
+      <div
+        className="absolute inset-0 pt-14 px-3"
+        style={{
+          display: 'grid',
+          gridTemplateRows: 'auto auto 1fr',
+          rowGap: 8,
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          overflow: 'hidden',
+        }}
+      >
 
         {/* Bannière marchand — compactée */}
         <div
-          className="flex items-center gap-2 mb-2 p-2 border-4 border-magic-gold relative shrink-0"
+          className="flex items-center gap-2 p-2 border-4 border-magic-gold relative"
           style={{
             background: 'linear-gradient(180deg, #92400e 0%, #78350f 100%)',
             boxShadow: '4px 4px 0 #000',
@@ -103,9 +115,9 @@ export default function ShopScreen({ navigate, onPause }) {
           <button className="pixel-btn pixel-btn-ghost shrink-0" onClick={() => navigate('worldmap')}>← Carte</button>
         </div>
 
-        {/* Onglets : sticky en haut, toujours visibles même quand on scroll les items */}
+        {/* Onglets : flex-1 → 4 onglets se répartissent toute la largeur, plus rien coupé */}
         <div
-          className="flex gap-1 mb-2 overflow-x-auto shrink-0 sticky top-0 z-10 py-1"
+          className="flex gap-1 py-1"
           style={{
             background: 'linear-gradient(180deg, rgba(15,4,32,0.98) 0%, rgba(15,4,32,0.85) 100%)',
             borderBottom: '2px solid #fbbf24',
@@ -117,25 +129,31 @@ export default function ShopScreen({ navigate, onPause }) {
               <button
                 key={t.key}
                 onClick={() => { sounds.select(); setTab(t.key); }}
-                className={`font-pixel text-xs px-3 py-2 border-b-4 transition-all whitespace-nowrap relative ${
+                className={`font-pixel border-b-4 transition-all flex flex-col items-center justify-center ${
                   tab === t.key
-                    ? 'bg-magic-gold text-magic-bg border-black scale-105'
-                    : 'bg-magic-bg2 text-magic-cream border-magic-accent hover:bg-magic-accent/30'
+                    ? 'bg-magic-gold text-magic-bg border-black'
+                    : 'bg-magic-bg2 text-magic-cream border-magic-accent'
                 }`}
+                style={{ flex: '1 1 0', minWidth: 0, padding: '4px 2px', fontSize: 9, lineHeight: 1.1 }}
               >
-                {t.label}
-                <span className={`ml-1 ${tab === t.key ? 'opacity-70' : 'opacity-50'}`}>({nbItems})</span>
+                <span style={{ fontSize: 14 }}>{t.label.split(' ')[0]}</span>
+                <span className="opacity-80">{t.label.split(' ').slice(1).join(' ')} ({nbItems})</span>
               </button>
             );
           })}
         </div>
 
-        {/* Stand d'articles — zone scrollable (pan-y autorisé via .overflow-y-auto en CSS global)
-            min-h-0 est CRUCIAL : sans ça, flex-1 garde min-height:auto et ne shrink jamais,
-            ce qui empêche overflow-y de scroller (le grid prend la taille de son contenu). */}
+        {/* Stand d'articles — zone scrollable (3e track du grid, hauteur 1fr explicite) */}
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full overflow-y-auto pb-8 flex-1 min-h-0"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full pb-8"
+          style={{
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            overscrollBehavior: 'contain',
+            minHeight: 0,
+            height: '100%',
+          }}
         >
           <AnimatePresence mode="popLayout">
             {items.map((item) => {
