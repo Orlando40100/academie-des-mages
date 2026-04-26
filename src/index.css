@@ -28,6 +28,23 @@ body {
   image-rendering: crisp-edges;
 }
 
+/* ─── Fix scroll mobile : autorise le pan-y sur les conteneurs scrollables ───
+   La règle globale `touch-action: manipulation` au html/body bloque l'inertie
+   scroll iOS sur les enfants. On ré-autorise explicitement le pan vertical sur
+   tous les divs marqués overflow-y-auto / overflow-auto, avec momentum iOS. */
+.overflow-y-auto,
+.overflow-y-scroll,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-x;
+}
+
 /* ─── Rendu pixel-art net sur tous les sprites (fix mobile) ───
    Les <img> intérieurs et les wrappers utilisent un compositing layer
    forcé pour que Chrome/Safari mobile ne révèlent pas les frames adjacentes

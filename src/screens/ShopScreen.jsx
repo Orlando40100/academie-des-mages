@@ -81,7 +81,7 @@ export default function ShopScreen({ navigate, onPause }) {
       />
 
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col">
+      <div className="absolute inset-0 pt-14 px-3 flex flex-col safe-bottom">
 
         {/* Bannière marchand — compactée */}
         <div
@@ -130,8 +130,8 @@ export default function ShopScreen({ navigate, onPause }) {
           })}
         </div>
 
-        {/* Stand d'articles — zone scrollable */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full overflow-y-auto pb-4 flex-1">
+        {/* Stand d'articles — zone scrollable (pan-y autorisé via .overflow-y-auto en CSS global) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full overflow-y-auto pb-8 flex-1">
           <AnimatePresence mode="popLayout">
             {items.map((item) => {
               const deja = estDejaPossede(state, tab, item.id);

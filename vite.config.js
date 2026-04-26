@@ -15,7 +15,11 @@ export default defineConfig({
         description: 'Jeu éducatif pixel art CM1 → CM2 → 6ème',
         theme_color: '#1a0b2e',
         background_color: '#1a0b2e',
-        display: 'standalone',
+        // fullscreen → masque toute UI navigateur quand l'app est installée en PWA.
+        // display_override permet aux navigateurs supportant fullscreen de l'utiliser,
+        // sinon ils retombent sur standalone (iOS Safari notamment).
+        display: 'fullscreen',
+        display_override: ['fullscreen', 'standalone', 'minimal-ui'],
         orientation: 'any',
         start_url: './',
         scope: './',

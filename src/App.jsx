@@ -72,6 +72,39 @@ function Router() {
     };
   }, []);
 
+  // Auto plein écran sur mobile : déclenché au premier geste utilisateur
+  // (les navigateurs interdisent requestFullscreen() sans user gesture).
+  // → On hook un listener one-shot qui se désinscrit après le premier tap.
+  // Sur iOS Safari, requestFullscreen() n'est pas supporté pour les éléments
+  // non-vidéo : le seul vrai plein écran possible est l'install en PWA
+  // (manifest display:'fullscreen' s'occupe de ça).
+  useEffect(() => {
+    const isStandalone =
+      window.matchMedia?.('(display-mode: fullscreen)').matches ||
+      window.matchMedia?.('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+    if (isStandalone) return; // déjà en mode plein écran (PWA installée)
+
+    const goFullscreen = () => {
+      const el = document.documentElement;
+      const req =
+        el.requestFullscreen ||
+        el.webkitRequestFullscreen ||
+        el.msRequestFullscreen;
+      if (req) {
+        try { req.call(el, { navigationUI: 'hide' }); } catch { try { req.call(el); } catch {} }
+      }
+      cleanup();
+    };
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', goFullscreen);
+      window.removeEventListener('keydown', goFullscreen);
+    };
+    window.addEventListener('pointerdown', goFullscreen, { once: true });
+    window.addEventListener('keydown', goFullscreen, { once: true });
+    return cleanup;
+  }, []);
+
   const navigate = (screen, pl = null) => {
     setPayload(pl);
     dispatch({ type: 'SET_SCREEN', screen });
