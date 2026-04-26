@@ -404,25 +404,26 @@ body {
     box-shadow: 1px 1px 0 #000;
     z-index: 2;
   }
-  /* Plaques de nom plus grandes et lisibles
-     (sur mobile : plus compact, pas de wrap pour rester lisible) */
+  /* Plaques de nom — autorise le wrap sur mobile pour afficher les longs noms
+     (Clairière, Château, Caverne, Montagne, Portail, Donjon, Forêt Myst.)
+     en intégralité plutôt que de les tronquer avec ellipsis. */
   .map-poi-label {
     font-family: 'Press Start 2P', monospace;
     font-size: 7px;
-    line-height: 1.3;
+    line-height: 1.25;
     color: #2a1503;
     background: linear-gradient(180deg, #fef3c7 0%, #fbbf24 100%);
     border: 2px solid #000;
-    padding: 2px 4px;
+    padding: 3px 5px;
     box-shadow: 1px 1px 0 #000;
     text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-    white-space: nowrap;
-    max-width: 70px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 96px;
+    text-align: center;
   }
   @media (min-width: 640px) {
-    .map-poi-label { font-size: 8px; line-height: 1.4; padding: 4px 7px; box-shadow: 2px 2px 0 #000; max-width: none; }
+    .map-poi-label { font-size: 8px; line-height: 1.4; padding: 4px 7px; box-shadow: 2px 2px 0 #000; max-width: none; white-space: nowrap; }
   }
   .map-poi-label.locked {
     background: linear-gradient(180deg, #4c2a85, #2d1b4e);
