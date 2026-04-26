@@ -228,7 +228,9 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
         />
       </svg>
 
-      {/* ═══════════ POI (mondes) — disque doré Direction A ═══════════ */}
+      {/* ═══════════ POI (mondes) — disque doré Direction A ═══════════
+           La plaque-nom alterne entre dessous (POI impairs) et dessus (POI pairs)
+           pour éviter les superpositions entre POI voisins sur la worldmap. */}
       {POI.map((poi) => {
         const unlocked = deverr.includes(poi.id);
         const stars = Object.keys(etoiles)
@@ -243,6 +245,21 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
         const subLabel = current
           ? `⚔️ ${niveauCourant}/${tot}`
           : (done >= tot ? '✓ Terminé' : (unlocked ? `${done}/${tot}` : '🔒'));
+        // Position du nom : alterne au-dessus / au-dessous selon la parité du POI
+        const labelAbove = poi.id % 2 === 0;
+        const labelBlock = (
+          <>
+            <div className={`map-poi-label ${!unlocked ? 'locked' : ''} text-center`}>
+              <div>{poi.id}. {poi.nom}</div>
+              <div className="mt-0.5" style={{ fontSize: 6 }}>{subLabel}</div>
+            </div>
+            {unlocked && stars > 0 && (
+              <div className="font-pixel text-[10px] text-magic-gold mt-1 drop-shadow-[1px_1px_0_#000]">
+                {'⭐'.repeat(Math.min(3, Math.ceil((stars / maxStars) * 3)))}
+              </div>
+            )}
+          </>
+        );
         return (
           <button
             key={poi.id}
@@ -251,7 +268,10 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
             className={`absolute -translate-x-1/2 -translate-y-1/2 focus:outline-none ${!unlocked ? 'cursor-not-allowed' : 'cursor-pointer hover:z-30'}`}
             style={{ left: `${poi.x}%`, top: `${poi.y}%`, touchAction: 'manipulation', zIndex: 20 }}
           >
-            <div className={`flex flex-col items-center ${isSelected ? 'scale-125' : ''} transition-transform`}>
+            <div className={`flex flex-col items-center gap-1.5 ${isSelected ? 'scale-125' : ''} transition-transform`}>
+              {/* Si label au-dessus : on l'affiche AVANT le disque */}
+              {labelAbove && labelBlock}
+
               {/* Disque POI Direction A */}
               <div className={`map-poi-disc ${!unlocked ? 'locked' : ''} ${current ? 'current' : ''}`}>
                 {unlocked ? (
@@ -263,18 +283,8 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
                 {current && <div className="map-poi-flag" />}
               </div>
 
-              {/* Plaque parchemin nom + progression */}
-              <div className={`map-poi-label mt-2 ${!unlocked ? 'locked' : ''} text-center`}>
-                <div>{poi.id}. {poi.nom}</div>
-                <div className="mt-0.5" style={{ fontSize: 6 }}>{subLabel}</div>
-              </div>
-
-              {/* Étoiles cumulées */}
-              {unlocked && stars > 0 && (
-                <div className="font-pixel text-[10px] text-magic-gold mt-1 drop-shadow-[1px_1px_0_#000]">
-                  {'⭐'.repeat(Math.min(3, Math.ceil((stars / maxStars) * 3)))}
-                </div>
-              )}
+              {/* Sinon (POI impair) : label en dessous */}
+              {!labelAbove && labelBlock}
             </div>
           </button>
         );
