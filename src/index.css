@@ -28,6 +28,25 @@ body {
   image-rendering: crisp-edges;
 }
 
+/* ─── Rendu pixel-art net sur tous les sprites (fix mobile) ───
+   Les <img> intérieurs et les wrappers utilisent un compositing layer
+   forcé pour que Chrome/Safari mobile ne révèlent pas les frames adjacentes
+   à cause d'arrondis sous-pixel pendant les scale(). */
+.pixel-sprite-wrap,
+.pixel-sprite-wrap > div,
+.pixel-sprite-wrap img,
+.pixel-img,
+.pixel-sprite {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
 /* ═══════════════════════════════════════════════════
    FONT UTILITIES
 ═══════════════════════════════════════════════════ */
