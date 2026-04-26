@@ -1,5 +1,6 @@
 import Background from '../components/Background.jsx';
 import HUD from '../components/HUD.jsx';
+import MobileScrollPane from '../components/MobileScrollPane.jsx';
 import { useGame } from '../store/gameStore.jsx';
 import { useState } from 'react';
 import { sounds } from '../audio/soundEngine.js';
@@ -9,13 +10,22 @@ function Stub({ title, emoji, children, navigate, onPause, variant = 'magic' }) 
   return (
     <Background variant={variant}>
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 px-4 flex flex-col items-center safe-bottom">
-        <div className="flex items-center gap-2 w-full max-w-3xl mb-4 mt-2">
-          <h2 className="pixel-title text-lg md:text-2xl flex-1">{emoji} {title}</h2>
-          <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
-        </div>
-        <div className="w-full max-w-3xl flex-1 min-h-0 overflow-y-auto pb-4" style={{ WebkitOverflowScrolling: 'touch' }}>{children}</div>
+
+      {/* Header fixé sous le HUD */}
+      <div
+        style={{
+          position: 'absolute', top: 60, left: 12, right: 12, zIndex: 5,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}
+      >
+        <h2 className="pixel-title text-lg md:text-2xl" style={{ flex: 1 }}>{emoji} {title}</h2>
+        <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
       </div>
+
+      {/* Zone scrollable bulletproof */}
+      <MobileScrollPane topOffset={108}>
+        <div className="w-full max-w-3xl mx-auto">{children}</div>
+      </MobileScrollPane>
     </Background>
   );
 }

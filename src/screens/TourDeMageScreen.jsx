@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Background from '../components/Background.jsx';
 import HUD from '../components/HUD.jsx';
+import MobileScrollPane from '../components/MobileScrollPane.jsx';
 import { useGame } from '../store/gameStore.jsx';
 import { sounds } from '../audio/soundEngine.js';
 import { TEXTURES } from '../components/GroundTexture.js';
@@ -63,12 +64,21 @@ export default function TourDeMageScreen({ navigate, onPause }) {
   return (
     <Background variant="magic">
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col overflow-y-auto">
-        <div className="flex items-center gap-2 mb-3">
-          <h2 className="pixel-title text-xl flex-1">🏠 Ma Tour</h2>
-          <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
-        </div>
 
+      {/* Header fixé sous le HUD */}
+      <div
+        style={{
+          position: 'absolute', top: 60, left: 12, right: 12, zIndex: 5,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}
+      >
+        <h2 className="pixel-title text-xl" style={{ flex: 1 }}>🏠 Ma Tour</h2>
+        <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
+      </div>
+
+      {/* Zone scrollable bulletproof */}
+      <MobileScrollPane topOffset={108}>
+        <div className="flex flex-col">
         {/* Onglets */}
         <div className="flex gap-1 mb-3 justify-center">
           {[['view','👁️ Vue'],['papier','🖼️ Murs'],['objets','📦 Objets']].map(([k, l]) => (
@@ -140,7 +150,8 @@ export default function TourDeMageScreen({ navigate, onPause }) {
             })}
           </div>
         )}
-      </div>
+        </div>
+      </MobileScrollPane>
     </Background>
   );
 }

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import HUD from '../components/HUD.jsx';
+import MobileScrollPane from '../components/MobileScrollPane.jsx';
 import PixelSprite from '../sprites/PixelSprite.jsx';
 import SmartSprite from '../sprites/SmartSprite.jsx';
 import { useGame } from '../store/gameStore.jsx';
@@ -43,14 +44,20 @@ export default function MenagerieScreen({ navigate, onPause }) {
   return (
     <div className="relative w-full h-full overflow-hidden bg-magic-bg2">
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-3 flex flex-col overflow-y-auto">
 
-        {/* Titre */}
-        <div className="flex items-center gap-2 mb-3">
-          <h2 className="pixel-title text-lg md:text-2xl flex-1">🐾 La Ménagerie</h2>
-          <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
-        </div>
+      {/* Header fixé sous le HUD */}
+      <div
+        style={{
+          position: 'absolute', top: 60, left: 12, right: 12, zIndex: 5,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}
+      >
+        <h2 className="pixel-title text-lg md:text-2xl" style={{ flex: 1 }}>🐾 La Ménagerie</h2>
+        <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
+      </div>
 
+      {/* Zone scrollable bulletproof */}
+      <MobileScrollPane topOffset={108}>
         <div className="font-retro text-magic-cream/80 mb-3 text-center">
           Rends visite à tes compagnons dans leur enclos
         </div>
@@ -160,7 +167,7 @@ export default function MenagerieScreen({ navigate, onPause }) {
             );
           })}
         </div>
-      </div>
+      </MobileScrollPane>
     </div>
   );
 }
