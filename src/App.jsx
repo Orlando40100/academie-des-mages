@@ -144,18 +144,29 @@ function Router() {
   // La home gère déjà les cas.
   const needsNewGame = screen !== 'home' && screen !== 'modeParent' && !state.player.prenom;
 
+  // BUG FIX : on utilise une clé STABLE pour le NewGameFlow.
+  // Avant, la key passait de 'newgame-forced' à 'newgame' au moment où
+  // dispatch(SET_PRENOM) mettait à jour le state, ce qui forçait
+  // <AnimatePresence> à démonter/remonter le composant et perdait son state
+  // interne (étape, prénom saisi). Résultat : le user devait ressaisir le
+  // prénom une 2e fois pour finalement arriver sur la worldmap.
+  // → On considère que tant qu'on est dans le flux nouvelle partie
+  //   (screen='newgame' OU prénom pas encore saisi), la clé reste 'newgame'.
+  const inNewGameFlow = needsNewGame || screen === 'newgame';
+  const animKey = inNewGameFlow ? 'newgame' : screen;
+
   return (
     <div className="w-screen h-[100dvh] overflow-hidden relative bg-magic-bg">
       <AnimatePresence mode="wait">
         <motion.div
-          key={needsNewGame ? 'newgame-forced' : screen}
+          key={animKey}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 1.02 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
           className="absolute inset-0"
         >
-          {needsNewGame ? <NewGameFlow onDone={(next) => navigate(next)} /> : content}
+          {inNewGameFlow ? <NewGameFlow onDone={(next) => navigate(next)} /> : content}
         </motion.div>
       </AnimatePresence>
       <SaveIndicator />
