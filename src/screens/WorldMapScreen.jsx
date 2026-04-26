@@ -174,17 +174,14 @@ export default function WorldMapScreen({ navigate, onPause }) {
             boxShadow: '0 -4px 12px rgba(0,0,0,0.5)',
           }}
         >
-          {/* Une seule rangée scrollable horizontalement → tient sur mobile sans déborder */}
-          <div
-            className="flex gap-1.5 overflow-x-auto pb-0.5"
-            style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-          >
-            <NavBtn color="gold"  emoji="🏪" label="Boutique"  onClick={() => { sounds.select(); navigate('shop'); }} />
-            <NavBtn color="pink"  emoji="🐾" label="Ménagerie" onClick={() => { sounds.select(); navigate('menagerie'); }} />
-            <NavBtn color="ghost" emoji="📖" label="Grimoire"  onClick={() => { sounds.select(); navigate('grimoire'); }} />
+          {/* 7 boutons en flex-1 : se répartissent toute la largeur dispo, jamais de débordement */}
+          <div className="flex gap-1 w-full">
+            <NavBtn color="gold"  emoji="🏪" label="Shop"      onClick={() => { sounds.select(); navigate('shop'); }} />
+            <NavBtn color="pink"  emoji="🐾" label="Pets"      onClick={() => { sounds.select(); navigate('menagerie'); }} />
+            <NavBtn color="ghost" emoji="📖" label="Livre"     onClick={() => { sounds.select(); navigate('grimoire'); }} />
             <NavBtn color="blue"  emoji="📅" label="Défi"      onClick={() => { sounds.select(); navigate('defi'); }} />
             <NavBtn color="blue"  emoji="🎮" label="Jeux"      onClick={() => { sounds.select(); navigate('minijeux'); }} />
-            <NavBtn color="ghost" emoji="🏛️" label="Arène"     onClick={() => { sounds.select(); navigate('arene'); }} />
+            <NavBtn color="ghost" emoji="🏛️" label="Arène"    onClick={() => { sounds.select(); navigate('arene'); }} />
             <NavBtn color="ghost" emoji="🏠" label="Tour"      onClick={() => { sounds.select(); navigate('tour'); }} />
           </div>
         </div>
@@ -318,8 +315,9 @@ function MapCanvas({ magePos, selected, walking, walkDir, deverr, mondeCourant, 
 // (Les anciens systèmes biomes / rivière / décor / particules / rose-des-vents
 //  ont été supprimés pour matcher le design Direction A — fond sombre épuré.)
 
-// Bouton de navigation compact, optimisé mobile (icône + label sur 2 lignes,
-// tient sur 7 boutons en une seule rangée scrollable horizontalement).
+// Bouton de navigation ultra-compact pour faire tenir 7 boutons sur un écran
+// de 390px (iPhone SE et autres) : flex-1 avec min-w-0, icône uniquement,
+// label minuscule. Le 1er bouton mobile = ~50px de large, lisible et tappable.
 function NavBtn({ emoji, label, color = 'ghost', onClick }) {
   const colorCls = {
     gold:  'pixel-btn-gold',
@@ -330,11 +328,11 @@ function NavBtn({ emoji, label, color = 'ghost', onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`pixel-btn ${colorCls} flex flex-col items-center justify-center gap-0.5 shrink-0`}
-      style={{ minWidth: 60, padding: '4px 6px', lineHeight: 1.1 }}
+      className={`pixel-btn ${colorCls} flex flex-col items-center justify-center gap-0`}
+      style={{ flex: '1 1 0', minWidth: 0, padding: '3px 2px', lineHeight: 1 }}
     >
-      <span style={{ fontSize: 18, lineHeight: 1 }}>{emoji}</span>
-      <span className="font-pixel" style={{ fontSize: 8 }}>{label}</span>
+      <span style={{ fontSize: 16, lineHeight: 1 }}>{emoji}</span>
+      <span className="font-pixel" style={{ fontSize: 7, marginTop: 2 }}>{label}</span>
     </button>
   );
 }

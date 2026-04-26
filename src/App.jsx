@@ -13,6 +13,7 @@ import ShopScreen from './screens/ShopScreen.jsx';
 import MenagerieScreen from './screens/MenagerieScreen.jsx';
 import PauseMenu from './screens/PauseMenu.jsx';
 import SaveIndicator from './components/SaveIndicator.jsx';
+import FullscreenButton from './components/FullscreenButton.jsx';
 import { GrimoireScreen, BestiaireScreen, BadgesScreen, ModeParentScreen } from './screens/Stubs.jsx';
 import AreneScreen from './screens/AreneScreen.jsx';
 import TourDeMageScreen from './screens/TourDeMageScreen.jsx';
@@ -158,6 +159,7 @@ function Router() {
         </motion.div>
       </AnimatePresence>
       <SaveIndicator />
+      <FullscreenButton />
       <PauseMenu open={pauseOpen} onClose={() => setPauseOpen(false)} navigate={(s) => { setPauseOpen(false); navigate(s); }} />
     </div>
   );

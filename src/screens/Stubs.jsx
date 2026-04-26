@@ -9,12 +9,12 @@ function Stub({ title, emoji, children, navigate, onPause, variant = 'magic' }) 
   return (
     <Background variant={variant}>
       <HUD onPause={onPause} />
-      <div className="absolute inset-0 pt-14 pb-4 px-4 flex flex-col items-center">
-        <div className="flex items-center gap-2 w-full max-w-3xl mb-4">
+      <div className="absolute inset-0 pt-14 px-4 flex flex-col items-center safe-bottom">
+        <div className="flex items-center gap-2 w-full max-w-3xl mb-4 mt-2">
           <h2 className="pixel-title text-lg md:text-2xl flex-1">{emoji} {title}</h2>
           <button className="pixel-btn pixel-btn-ghost" onClick={() => navigate('worldmap')}>← Carte</button>
         </div>
-        <div className="w-full max-w-3xl flex-1 overflow-y-auto">{children}</div>
+        <div className="w-full max-w-3xl flex-1 min-h-0 overflow-y-auto pb-4" style={{ WebkitOverflowScrolling: 'touch' }}>{children}</div>
       </div>
     </Background>
   );

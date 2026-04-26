@@ -45,10 +45,11 @@ body {
   touch-action: pan-x;
 }
 
-/* ─── Rendu pixel-art net sur tous les sprites (fix mobile) ───
-   Les <img> intérieurs et les wrappers utilisent un compositing layer
-   forcé pour que Chrome/Safari mobile ne révèlent pas les frames adjacentes
-   à cause d'arrondis sous-pixel pendant les scale(). */
+/* ─── Rendu pixel-art net (sans casser le clipping) ───
+   IMPORTANT : on n'applique PAS `transform-style: preserve-3d`
+   parce que ça empêche `overflow: hidden` de clipper les enfants
+   transformés (les frames adjacentes du spritesheet remontent).
+   On garde uniquement image-rendering:pixelated. */
 .pixel-sprite-wrap,
 .pixel-sprite-wrap > div,
 .pixel-sprite-wrap img,
@@ -58,10 +59,11 @@ body {
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
+}
+/* Le wrapper externe utilise clip-path en plus de overflow:hidden : sur iOS
+   Safari, clip-path est plus fiable pour clipper du contenu transformé. */
+.pixel-sprite-wrap {
+  clip-path: inset(0);
 }
 
 /* ═══════════════════════════════════════════════════

@@ -130,8 +130,13 @@ export default function ShopScreen({ navigate, onPause }) {
           })}
         </div>
 
-        {/* Stand d'articles — zone scrollable (pan-y autorisé via .overflow-y-auto en CSS global) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full overflow-y-auto pb-8 flex-1">
+        {/* Stand d'articles — zone scrollable (pan-y autorisé via .overflow-y-auto en CSS global)
+            min-h-0 est CRUCIAL : sans ça, flex-1 garde min-height:auto et ne shrink jamais,
+            ce qui empêche overflow-y de scroller (le grid prend la taille de son contenu). */}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full overflow-y-auto pb-8 flex-1 min-h-0"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           <AnimatePresence mode="popLayout">
             {items.map((item) => {
               const deja = estDejaPossede(state, tab, item.id);

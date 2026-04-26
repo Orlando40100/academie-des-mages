@@ -2,18 +2,25 @@ import { memo, useEffect, useState } from 'react';
 
 // Affiche un PNG en pixel-art avec support de feuilles sprite.
 //
-// ────── Pourquoi cette structure imbriquée ? ──────
-// Avant : on appliquait `transform: translate(...) scale(...)` directement sur l'<img>.
-// Sur mobile (Safari iOS / Chrome Android avec DPR=2 ou 3), la combinaison
-// translate(...)+scale(...) sur une image avec `overflow:hidden` au parent souffre
-// d'arrondis sous-pixel : la frame adjacente "fuit" d'un demi-pixel et s'affiche.
+// ────── Approche background-image (la plus fiable cross-browser) ──────
 //
-// Solution robuste : on dimensionne TOUT en pixels logiques non scalés (16×16 ici),
-// on translate l'<img> en coordonnées non scalées (entiers propres), puis on
-// applique `scale(N)` au CONTENEUR INTERMÉDIAIRE. Le wrapper externe verrouille
-// la taille de layout (frameWidth*scale × frameHeight*scale) et clippe net.
-// → Pas d'arrondi sous-pixel possible : tous les offsets sont des entiers en
-//   coordonnées non-scalées, le scale est appliqué après le clipping.
+// Pourquoi pas <img> + transform ? Sur mobile (Safari iOS / Chrome Android),
+// la combinaison `transform: translate(...) scale(...)` sur une <img> à
+// l'intérieur d'un parent en `overflow: hidden` souffre d'arrondis sous-pixel
+// quand le DPR est fractionnaire (2, 2.625, 3) — les frames adjacentes du
+// spritesheet "fuient" à travers le clipping et apparaissent collées.
+//
+// Solution : on n'utilise pas <img> du tout. On affiche le spritesheet via
+// `background-image` sur un div, et on choisit la frame avec `background-position`
+// en coordonnées non scalées (entiers parfaits). Le clipping se fait via
+// `overflow: hidden` SANS transform sur l'élément clippé. La mise à l'échelle
+// est faite par un transform scale() sur le DIV CLIPPÉ (pas son contenu) —
+// l'overflow hidden s'applique avant le scale, donc le clipping est exact.
+//
+// Structure :
+//   outer (frameWidth*scale × frameHeight*scale, overflow:hidden, layout)
+//     inner (frameWidth × frameHeight, overflow:hidden, scale(N) au transform,
+//            background-image avec background-position propre)
 //
 // Props :
 //  - src : chemin vers le PNG
@@ -23,11 +30,6 @@ import { memo, useEffect, useState } from 'react';
 //  - animate : array de [col, row] à alterner automatiquement
 //  - frameRate : ms entre frames d'animation (défaut 300)
 //  - flipX : inverser horizontalement
-//
-// Exemples :
-//  <ImageSprite src="/assets/coin.png" scale={3} />
-//  <ImageSprite src="/assets/mage.png" scale={3} frameWidth={16} frameHeight={16} col={0} row={0} />
-//  <ImageSprite src="/assets/mage-walk.png" frameWidth={16} frameHeight={16} animate={[[0,0],[1,0],[2,0],[3,0]]} />
 
 function ImageSpriteImpl({
   src,
@@ -71,12 +73,7 @@ function ImageSpriteImpl({
     );
   }
 
-  // ─── Cas 2 : frame extraite d'une feuille sprite ───
-  // Triple wrapper :
-  //   1. outer : taille de layout finale (scaled), isolation pour stacking context propre
-  //   2. middle : taille non scalée, scale(N) + flip appliqués, clipping net
-  //   3. img : translate non scalé (entiers parfaits), display:block pour pas de baseline gap
-  const sx = flipX ? -scale : scale;
+  // ─── Cas 2 : frame extraite d'une feuille sprite (background-image) ───
   return (
     <div
       className={`pixel-sprite-wrap inline-block ${className}`}
@@ -85,7 +82,8 @@ function ImageSpriteImpl({
         height: frameHeight * scale,
         overflow: 'hidden',
         position: 'relative',
-        isolation: 'isolate',
+        // flip appliqué au wrapper externe (clippage déjà fait par les enfants)
+        transform: flipX ? 'scaleX(-1)' : undefined,
         ...style,
       }}
     >
@@ -94,25 +92,16 @@ function ImageSpriteImpl({
           width: frameWidth,
           height: frameHeight,
           overflow: 'hidden',
-          transform: `scale(${sx}, ${scale})`,
+          transform: `scale(${scale})`,
           transformOrigin: 'top left',
-          // si flipX : on translate après scale négatif pour ramener dans la zone visible
-          marginLeft: flipX ? frameWidth * scale : 0,
+          backgroundImage: `url(${src})`,
+          // Offsets en pixels CSS NON scalés → entiers parfaits, pas d'arrondi
+          backgroundPosition: `${-curCol * frameWidth}px ${-curRow * frameHeight}px`,
+          backgroundSize: 'auto auto', // taille naturelle du PNG (ex. 64×16 ou 64×64)
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'pixelated',
         }}
-      >
-        <img
-          src={src}
-          alt={alt}
-          draggable={false}
-          style={{
-            display: 'block',
-            imageRendering: 'pixelated',
-            transform: `translate(${-curCol * frameWidth}px, ${-curRow * frameHeight}px)`,
-            transformOrigin: 'top left',
-            // pas de width/height : on garde la taille naturelle de l'img (= sheetCols*frameWidth)
-          }}
-        />
-      </div>
+      />
     </div>
   );
 }
