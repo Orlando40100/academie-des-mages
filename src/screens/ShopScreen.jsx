@@ -81,120 +81,114 @@ export default function ShopScreen({ navigate, onPause }) {
       />
 
       <HUD onPause={onPause} />
-      {/* CSS Grid au lieu de flex-col : la 3e ligne (1fr) a une hauteur intrinsèquement
-          contrainte → overflow-y scroll fiable sur tous les WebKit mobile.
-          Le wrapper a overflow:hidden pour empêcher la page entière de scroller. */}
+
+      {/* ════════════════════════════════════════════════════════════════
+          ZONE 1 : Bannière marchand — fixée en haut, sous le HUD
+          (position absolute, hauteur fixe, pas dans le flux scrollable)
+          ════════════════════════════════════════════════════════════════ */}
       <div
-        className="absolute inset-0 pt-14 px-3"
+        className="absolute left-3 right-3 flex items-center gap-2 p-2 border-4 border-magic-gold"
         style={{
-          display: 'grid',
-          gridTemplateRows: 'auto auto 1fr',
-          rowGap: 8,
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          overflow: 'hidden',
+          top: 'calc(56px + 4px)', // sous le HUD (top-14 = 56px)
+          background: 'linear-gradient(180deg, #92400e 0%, #78350f 100%)',
+          boxShadow: '4px 4px 0 #000',
+          zIndex: 5,
         }}
       >
-
-        {/* Bannière marchand — compactée */}
-        <div
-          className="flex items-center gap-2 p-2 border-4 border-magic-gold relative"
-          style={{
-            background: 'linear-gradient(180deg, #92400e 0%, #78350f 100%)',
-            boxShadow: '4px 4px 0 #000',
-          }}
-        >
-          <div className="relative shrink-0">
-            <div className="animate-breathe">
-              <SmartSprite assetKey="marchandIdle" fallback={marchandSprite} scale={2} direction="front" />
-            </div>
+        <div className="relative shrink-0">
+          <div className="animate-breathe">
+            <SmartSprite assetKey="marchandIdle" fallback={marchandSprite} scale={2} direction="front" />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-pixel text-xs text-magic-gold leading-tight">⚜️ L'Échoppe du Mage Marchand ⚜️</div>
-            <div className="font-retro text-sm text-magic-cream truncate">« Jette un œil à mes trésors. »</div>
-          </div>
-          <button className="pixel-btn pixel-btn-ghost shrink-0" onClick={() => navigate('worldmap')}>← Carte</button>
         </div>
-
-        {/* Onglets : flex-1 → 4 onglets se répartissent toute la largeur, plus rien coupé */}
-        <div
-          className="flex gap-1 py-1"
-          style={{
-            background: 'linear-gradient(180deg, rgba(15,4,32,0.98) 0%, rgba(15,4,32,0.85) 100%)',
-            borderBottom: '2px solid #fbbf24',
-          }}
-        >
-          {TABS.map((t) => {
-            const nbItems = catalogue[t.key]?.length || 0;
-            return (
-              <button
-                key={t.key}
-                onClick={() => { sounds.select(); setTab(t.key); }}
-                className={`font-pixel border-b-4 transition-all flex flex-col items-center justify-center ${
-                  tab === t.key
-                    ? 'bg-magic-gold text-magic-bg border-black'
-                    : 'bg-magic-bg2 text-magic-cream border-magic-accent'
-                }`}
-                style={{ flex: '1 1 0', minWidth: 0, padding: '4px 2px', fontSize: 9, lineHeight: 1.1 }}
-              >
-                <span style={{ fontSize: 14 }}>{t.label.split(' ')[0]}</span>
-                <span className="opacity-80">{t.label.split(' ').slice(1).join(' ')} ({nbItems})</span>
-              </button>
-            );
-          })}
+        <div className="flex-1 min-w-0">
+          <div className="font-pixel text-xs text-magic-gold leading-tight">⚜️ L'Échoppe du Mage Marchand ⚜️</div>
+          <div className="font-retro text-sm text-magic-cream truncate">« Jette un œil à mes trésors. »</div>
         </div>
+        <button className="pixel-btn pixel-btn-ghost shrink-0" onClick={() => navigate('worldmap')}>← Carte</button>
+      </div>
 
-        {/* Stand d'articles — zone scrollable (3e track du grid, hauteur 1fr explicite) */}
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto w-full pb-8"
-          style={{
-            overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            touchAction: 'pan-y',
-            overscrollBehavior: 'contain',
-            minHeight: 0,
-            height: '100%',
-          }}
-        >
-          <AnimatePresence mode="popLayout">
-            {items.map((item) => {
-              const deja = estDejaPossede(state, tab, item.id);
-              const peutPayer = state.player.piecesOr >= item.prix;
-              return (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -10, opacity: 0 }}
-                  whileHover={{ scale: 1.03 }}
-                  className="bg-gradient-to-br from-magic-bg2 to-magic-bg border-4 border-magic-gold p-3 relative"
-                  style={{ boxShadow: '3px 3px 0 #000' }}
+      {/* ════════════════════════════════════════════════════════════════
+          ZONE 2 : Onglets — fixés sous la bannière
+          (4 boutons en flex-1, plus rien coupé)
+          ════════════════════════════════════════════════════════════════ */}
+      <div
+        className="absolute left-3 right-3 flex gap-1 py-1"
+        style={{
+          top: 'calc(56px + 4px + 64px + 4px)', // HUD + gap + banner ~64px + gap
+          background: 'linear-gradient(180deg, rgba(15,4,32,0.98) 0%, rgba(15,4,32,0.85) 100%)',
+          borderBottom: '2px solid #fbbf24',
+          zIndex: 5,
+        }}
+      >
+        {TABS.map((t) => {
+          const nbItems = catalogue[t.key]?.length || 0;
+          return (
+            <button
+              key={t.key}
+              onClick={() => { sounds.select(); setTab(t.key); }}
+              className={`font-pixel border-b-4 transition-all flex flex-col items-center justify-center ${
+                tab === t.key
+                  ? 'bg-magic-gold text-magic-bg border-black'
+                  : 'bg-magic-bg2 text-magic-cream border-magic-accent'
+              }`}
+              style={{ flex: '1 1 0', minWidth: 0, padding: '4px 2px', fontSize: 9, lineHeight: 1.1 }}
+            >
+              <span style={{ fontSize: 14 }}>{t.label.split(' ')[0]}</span>
+              <span className="opacity-80">{t.label.split(' ').slice(1).join(' ')} ({nbItems})</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════
+          ZONE 3 : Items — position absolute avec top et bottom explicites
+          → hauteur = 100dvh - top - bottom, garantie par le browser layout.
+          overflow-y: auto fonctionne TOUJOURS dans ce cas (pas de flex
+          ambiguity, pas de min-height auto, pas de framer-motion).
+          ════════════════════════════════════════════════════════════════ */}
+      <div
+        className="absolute left-3 right-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-5xl mx-auto"
+        style={{
+          top: 'calc(56px + 4px + 64px + 4px + 56px + 8px)', // HUD + banner + tabs + gaps
+          bottom: 'env(safe-area-inset-bottom, 0px)',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
+          overscrollBehavior: 'contain',
+          paddingBottom: 12,
+        }}
+      >
+        {items.map((item) => {
+          const deja = estDejaPossede(state, tab, item.id);
+          const peutPayer = state.player.piecesOr >= item.prix;
+          return (
+            <div
+              key={item.id}
+              className="bg-gradient-to-br from-magic-bg2 to-magic-bg border-4 border-magic-gold p-3 relative"
+              style={{ boxShadow: '3px 3px 0 #000' }}
+            >
+              <div className="flex items-start gap-2">
+                <div className="bg-magic-bg border-2 border-magic-accent p-2 shrink-0">
+                  <span className="text-3xl">{item.icon}</span>
+                </div>
+                <div className="flex-1">
+                  <div className="font-pixel text-xs text-magic-gold">{item.nom}</div>
+                  <div className="font-retro text-sm text-magic-cream/80 mt-1">{item.desc}</div>
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-3 pt-2 border-t-2 border-magic-accent/30">
+                <span className="font-pixel text-sm text-magic-gold">🪙 {item.prix}</span>
+                <button
+                  onClick={() => acheter(item)}
+                  disabled={deja || !peutPayer}
+                  className={`pixel-btn ${deja ? 'pixel-btn-ghost opacity-60' : peutPayer ? 'pixel-btn-gold' : 'pixel-btn-ghost opacity-60'}`}
                 >
-                  {/* Socle item */}
-                  <div className="flex items-start gap-2">
-                    <div className="bg-magic-bg border-2 border-magic-accent p-2 shrink-0">
-                      <span className="text-3xl">{item.icon}</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-pixel text-xs text-magic-gold">{item.nom}</div>
-                      <div className="font-retro text-sm text-magic-cream/80 mt-1">{item.desc}</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-3 pt-2 border-t-2 border-magic-accent/30">
-                    <span className="font-pixel text-sm text-magic-gold">🪙 {item.prix}</span>
-                    <button
-                      onClick={() => acheter(item)}
-                      disabled={deja || !peutPayer}
-                      className={`pixel-btn ${deja ? 'pixel-btn-ghost opacity-60' : peutPayer ? 'pixel-btn-gold' : 'pixel-btn-ghost opacity-60'}`}
-                    >
-                      {deja ? '✓ Possédé' : peutPayer ? 'Acheter' : 'Trop cher'}
-                    </button>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
+                  {deja ? '✓ Possédé' : peutPayer ? 'Acheter' : 'Trop cher'}
+                </button>
+              </div>
+            </div>
+          );
+        })}
 
         {/* Notification achat */}
         <AnimatePresence>
